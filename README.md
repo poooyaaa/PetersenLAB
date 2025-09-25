@@ -22,57 +22,55 @@ We bridge continuum electrochemical equations with particle-based simulations in
 ---
 
 ## Governing Equations
-The electrostatic potential \( \Phi(x) \) satisfies Poisson’s equation:
+The electrostatic potential $\Phi(x)$ is governed by Poisson’s equation:
 
 $$
 -\varepsilon \nabla^2 \Phi(x) = \rho_c(x)
 $$
 
-The electric field and Gauss’s law:
+Equivalently,
 
 $$
-E(x) = -\nabla \Phi(x), \qquad \nabla \cdot E(x) = \rho_c(x)
+\mathbf{E}(x) = -\nabla \Phi(x), \qquad \nabla \cdot \mathbf{E}(x) = \rho_c(x).
 $$
 
 Charge density from local ion concentrations:
 
 $$
-\rho_c(x) = e_0 \, \big( c_{+}(x) - c_{-}(x) \big)
+\rho_c(x) = e_0 \big(c_{+}(x) - c_{-}(x)\big),
 $$
 
-where \( e_0 \) is the elementary charge, \( c_{+} \) is the cation concentration, and \( c_{-} \) is the anion concentration.
+where $e_0$ is the elementary charge, $c_{+}$ is the cation concentration, and $c_{-}$ is the anion concentration.
 
 ---
 
 ## Charge Density from Particle Simulations
-Discretize the domain into voxels \( V_j \) with volume \( \Delta V \).  
-From instantaneous particle positions, form counts \( N^{+}_j \) and \( N^{-}_j \):
+Discretize the domain into voxels $\mathcal{V}_j$ with volume $\Delta V$. From instantaneous particle positions,
+form voxel counts $N^{+}_j$ and $N^{-}_j$:
 
 $$
-c_{+}(x_j) \approx \frac{N^{+}_j}{\Delta V},
-\qquad
-c_{-}(x_j) \approx \frac{N^{-}_j}{\Delta V}
+c_{+}(x_j) \approx \frac{N^{+}_j}{\Delta V}, \qquad
+c_{-}(x_j) \approx \frac{N^{-}_j}{\Delta V}.
 $$
 
-Substitute into the expression for \( \rho_c \) above.
+Substituting gives a piecewise-constant estimator for $\rho_c$.
 
-**Statistical rescaling:**  
-If the real system contains \( N_{\text{real}} \) ions but we simulate \( N_{\text{sim}} \gg N_{\text{real}} \), then
+**Statistical rescaling.** If the real system contains $N_{\mathrm{real}}$ ions but we simulate $N_{\mathrm{sim}}\gg N_{\mathrm{real}}$ independent Brownian trajectories, then
 
 $$
-\rho_c^{real}(x) = \frac{N_{real}}{N_{sim}} \, \rho_c^{sim}(x)
+\rho_c^{\mathrm{real}}(x) = \frac{N_{\mathrm{real}}}{N_{\mathrm{sim}}}\,\rho_c^{\mathrm{sim}}(x).
 $$
+
 
 ---
 
 ## Field Solution Strategy
-At selected coupling times \( t_k \):
+At selected coupling times $t_k$:
 
-1. **Aggregate positions:** collect particle coordinates \( \{ x_i(t_k) \} \).
-2. **Form \( \rho_c(x) \):** bin particles into voxels.
-3. **Solve Poisson:** compute \( \Phi \) and \( E = -\nabla \Phi \).
+1. **Aggregate positions:** collect particle coordinates $\{x_i(t_k)\}$.
+2. **Form $\rho_c(x)$:** bin particles to voxels.
+3. **Solve Poisson:** compute $\Phi$ and $\mathbf{E}=-\nabla\Phi$; store $(\Phi,\mathbf{E})$.
 4. **Update field:** inject the new field into the particle simulator.
 5. **Advance particles:** integrate the next block of Brownian steps with electrostatic forces.
 
-Coupling does not occur every micro-step.  
-Instead, choose a stride \( n_{BD} \): particles advance \( n_{BD} \) steps between field updates.
+Coupling does not occur every micro-step; choose a stride $n_{\mathrm{BD}}\in \mathbb{N}$ (particles advance $n_{\mathrm{BD}}$ steps between field updates).
