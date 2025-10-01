@@ -82,4 +82,4 @@ Coupling does not occur every micro-step; choose a stride $n_{\mathrm{BD}}\in \m
 
 
 
-<video src="assets/animation.mp4" controls width="600"></video>
+![Simulation demo](assets/animation.gif)
