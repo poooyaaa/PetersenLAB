@@ -79,7 +79,18 @@ At selected coupling times $t_k$:
 
 Coupling does not occur every micro-step; choose a stride $n_{\mathrm{BD}}\in \mathbb{N}$ (particles advance $n_{\mathrm{BD}}$ steps between field updates).
 
+---
 
+## RWPT–Continuum Coupling: Visualization
 
 
 ![Simulation demo](assets/animation.gif)
+
+This visualization shows the **Random Walk Particle Tracking (RWPT)** simulation of charged ions in a nanoscale channel. The upper panels display the normalized ion concentration profiles of anions (orange) and cations (purple) across the channel, while the lower panels show the corresponding particle positions at different times.
+
+Initially, particles are uniformly distributed within one pore, with roughly $10^5$ trajectories initialized randomly across the domain. To drive the system, we impose the electrostatic potential and velocity fields obtained from a **continuum electrokinetic solver**. These fields act as external forces on the ions, steering their motion over time.
+
+As the simulation progresses, the cations and anions redistribute and self-organize into regions consistent with the applied electric field. The ions accumulate preferentially in zones where the field aligns with their charge polarity, while being excluded from unfavorable regions. This dynamic adjustment demonstrates how microscopic particle transport reflects the macroscopic electrostatic structure.
+
+The results highlight a key insight: instead of always prescribing fields from continuum mechanics into particle simulations, we can **invert the workflow**. By measuring particle positions, constructing the charge density, and solving Poisson’s equation, we can directly obtain the electric field from RWPT simulations. This reverse coupling provides a pathway to validate continuum models and to quantify screening effects from the particle perspective.
+
