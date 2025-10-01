@@ -13,6 +13,8 @@
 - [Governing Equations](#governing-equations)
 - [Charge Density from Particle Simulations](#charge-density-from-particle-simulations)
 - [Field Solution Strategy](#field-solution-strategy)
+- [RWPT–Continuum Coupling: Visualization](#rwptcontinuum-coupling-visualization)
+- [Future Test Case: Salt-Asymmetric Channel with Sinusoidal Wall Charge](#future-test-case-salt-asymmetric-channel-with-sinusoidal-wall-charge)
 
 ---
 
