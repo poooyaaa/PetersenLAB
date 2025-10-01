@@ -94,3 +94,18 @@ As the simulation progresses, the cations and anions redistribute and self-organ
 
 The results highlight a key insight: instead of always prescribing fields from continuum mechanics into particle simulations, we can **invert the workflow**. By measuring particle positions, constructing the charge density, and solving Poisson’s equation, we can directly obtain the electric field from RWPT simulations. This reverse coupling provides a pathway to validate continuum models and to quantify screening effects from the particle perspective.
 
+---
+
+## Future Test Case: Salt-Asymmetric Channel with Sinusoidal Wall Charge
+
+Later, this method will be tested on a more challenging configuration: a channel with **two different bulk salt concentrations** (left vs. right) and **sinusoidally varying surface charges** along the walls.
+
+- **Setup:** The left reservoir contains a high salt concentration, while the right reservoir has a low salt concentration. This concentration gradient naturally drives ions across the interface.  
+- **Boundary forcing:** The top and bottom walls are decorated with sinusoidal charge patterns, alternating between cation-attracting and anion-attracting regions.  
+- **Expected outcome:** The combined action of the salt gradient and the oscillatory wall charges should produce a spatially modulated ion distribution, with electric fields that cannot be captured by simple uniform-wall models.
+
+This example serves as a validation benchmark: if the RWPT-derived charge density \(\rho_c(\mathbf{x})\) correctly reproduces the field structure predicted by continuum electrostatics, it demonstrates the robustness of the **particle-to-field coupling** framework.
+
+<p align="center">
+  <img src="assets/fig_example.png" alt="Salt-asymmetric channel with sinusoidal wall charges" width="70%">
+</p>
