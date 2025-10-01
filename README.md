@@ -104,7 +104,7 @@ Later, this method will be tested on a more challenging configuration: a channel
 - **Boundary forcing:** The top and bottom walls are decorated with sinusoidal charge patterns, alternating between cation-attracting and anion-attracting regions.  
 - **Expected outcome:** The combined action of the salt gradient and the oscillatory wall charges should produce a spatially modulated ion distribution, with electric fields that cannot be captured by simple uniform-wall models.
 
-This example serves as a validation benchmark: if the RWPT-derived charge density ($\rho_c(x)$) correctly reproduces the field structure predicted by continuum electrostatics, it demonstrates the robustness of the **particle-to-field coupling** framework.
+This example serves as a validation benchmark: if the RWPT-derived charge density $\\rho_c(\\mathbf{x})$ correctly reproduces the field structure predicted by continuum electrostatics, it demonstrates the robustness of the **particle-to-field coupling** framework.
 
 <p align="center">
   <img src="assets/fig_example.png" alt="Salt-asymmetric channel with sinusoidal wall charges" width="70%">
