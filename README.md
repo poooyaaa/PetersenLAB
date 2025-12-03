@@ -196,7 +196,7 @@ Utilities are provided to:
 ---
 ## Governing equations
 
-The electrostatic potential $\Phi(\mathbf{x})$ is governed by **Poisson’s equation**:
+The electrostatic potential $\Phi(\mathbf{x})$ is governed by Poisson’s equation:
 
 $$
 -\varepsilon \nabla^2 \Phi(\mathbf{x}) = \rho_c(\mathbf{x}),
@@ -215,7 +215,7 @@ $$
 \nabla \cdot \mathbf{E}(\mathbf{x}) = \rho_c(\mathbf{x}).
 $$
 
-To compute $\rho_c(\mathbf{x})$, we consider the local density of cations and anions in each voxel of the simulation domain. The volumetric charge density is
+In an electrolyte, $\rho_c(\mathbf{x})$ is determined by the local number densities of cations and anions. At the continuum level, we write
 
 $$
 \rho_c(\mathbf{x}) = e_0 \bigl(c^+(\mathbf{x}) - c^-(\mathbf{x})\bigr),
@@ -227,33 +227,26 @@ where
 - $c^+(\mathbf{x})$ is the cation concentration,
 - $c^-(\mathbf{x})$ is the anion concentration.
 
----
-
-## Charge density from particle simulations
-
-We discretize the domain into voxels $\mathcal{V}_j$ of volume $\Delta V$.  
-From instantaneous particle positions, we form voxel counts $N_j^{+}$ and $N_j^{-}$.  
-The corresponding number concentrations are approximated as
+In the particle-based simulation, these concentrations are constructed directly from particle positions. We discretize the domain into voxels $\mathcal{V}_j$ of volume $\Delta V$. From instantaneous particle positions, we form voxel counts $N_j^{+}$ and $N_j^{-}$ for cations and anions, respectively. The corresponding number concentrations are approximated as
 
 $$
 c^{+}(x_j) \approx \frac{N_j^{+}}{\Delta V}, \qquad
 c^{-}(x_j) \approx \frac{N_j^{-}}{\Delta V}.
 $$
 
-Substituting the voxel-based expression for ion concentrations into the volumetric
-charge-density relation gives a **piecewise-constant estimator** for $\rho_c$.
+Substituting the voxel-based expressions for ion concentrations into the volumetric
+charge-density relation gives a **piecewise-constant estimator** for $\rho_c$ on the grid.
 
-**Statistical rescaling.** If the real system contains $N_{\text{real}}$ ions,
-but we simulate $N_{\text{sim}} \gg N_{\text{real}}$ independent Brownian
-trajectories. This approach preserves the spatial structure of the simulated ion clouds while
-ensuring consistency with the physical number density.
-
+**Statistical rescaling.** In practice, the real system may contain $N_{\text{real}}$ ions, while we simulate $N_{\text{sim}} \gg N_{\text{real}}$ independent Brownian trajectories. We rescale the simulated charge density so that
 
 $$
 \rho_c^{\text{real}}(\mathbf{x}) =
 \frac{N_{\text{real}}}{N_{\text{sim}}}\,
 \rho_c^{\text{sim}}(\mathbf{x}).
 $$
+
+This preserves the spatial structure of the simulated ion clouds while ensuring consistency with the physical number density used in the Poisson solve.
+
 
 ---
 
