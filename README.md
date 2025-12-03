@@ -141,7 +141,7 @@ $$
 4. Computes the electric field as
 
 $$
-\mathbf{E} = -\nabla \phi
+\mathbf{E} = -\nabla \Phi
 $$
 
    on the same structured grid used for RWPT.
@@ -247,6 +247,7 @@ charge-density relation gives a **piecewise-constant estimator** for $\rho_c$.
 but we simulate $N_{\text{sim}} \gg N_{\text{real}}$ independent Brownian
 trajectories. This approach preserves the spatial structure of the simulated ion clouds while
 ensuring consistency with the physical number density.
+
 
 $$
 \rho_c^{\text{real}}(\mathbf{x}) =
