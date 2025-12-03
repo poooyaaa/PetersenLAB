@@ -227,3 +227,88 @@ where
 - $c^-(\mathbf{x})$ is the anion concentration.
 
 ---
+
+## Charge density from particle simulations
+
+We discretize the domain into voxels $\mathcal{V}_j$ of volume $\Delta V$.  
+From instantaneous particle positions, we form voxel counts $N_j^{+}$ and $N_j^{-}$.  
+The corresponding number concentrations are approximated as
+
+$$
+c^{+}(x_j) \approx \frac{N_j^{+}}{\Delta V}, \qquad
+c^{-}(x_j) \approx \frac{N_j^{-}}{\Delta V}.
+$$
+
+Substituting the voxel-based expression for ion concentrations into the volumetric
+charge-density relation gives a **piecewise-constant estimator** for $\rho_c$.
+
+**Statistical rescaling.** If the real system contains $N_{\text{real}}$ ions,
+but we simulate $N_{\text{sim}} \gg N_{\text{real}}$ independent Brownian
+trajectories, then
+
+$$
+\rho_c^{\text{real}}(\mathbf{x}) =
+\frac{N_{\text{real}}}{N_{\text{sim}}}\,
+\rho_c^{\text{sim}}(\mathbf{x}).
+$$
+
+This approach preserves the spatial structure of the simulated ion clouds while
+ensuring consistency with the physical number density.
+---
+
+## Field solution strategy
+
+At selected coupling times $t_k$, the code performs a field update:
+
+1. **Aggregate positions**: collect particle coordinates $\mathbf{x}_i(t_k)$.
+2. **Form $\rho_c(\mathbf{x})$**: bin particles into voxels and construct the charge density.
+3. **Solve Poisson**: compute $\Phi$ and $\mathbf{E} = -\nabla \Phi$; store $(\Phi, \mathbf{E})$.
+4. **Update field**: inject the new field into the particle simulator.
+5. **Advance particles**: integrate the next block of Brownian steps with electrostatic forces.
+
+Coupling does not occur at every micro-step; instead we choose a stride $n_{\mathrm{BD}} \in \mathbb{N}$.  
+Particles advance $n_{\mathrm{BD}}$ RWPT steps between field updates.
+
+---
+
+## Results
+
+---
+
+## So what – why this is useful
+
+This project turns a neutral RWPT code into a **particle-based electrokinetic
+simulator**.
+
+It keeps the advantages of RWPT:
+
+- low numerical diffusion,
+- natural handling of complex pore geometries.
+
+At the same time, it adds essential physics for:
+
+- charged species,
+- electrostatic interactions,
+- and feedback between ions and the electric field.
+
+With this code, you can:
+
+- Study how cation and anion plumes evolve in a charged nanochannel.
+- Explore the impact of different wall-charge patterns on ion transport.
+- Compare continuum E-fields with self-consistent particle-based fields.
+- Test new ideas for electrokinetic devices without rewriting the full solver.
+
+From a **research** point of view, the code provides:
+
+- a bridge between **PAR²-style RWPT** and **Poisson-based electrostatics**,
+- a flexible platform for **multi-species ion transport**,
+- a way to analyze how micro-scale charge distributions feed back on macroscopic transport.
+
+From a **practical** point of view:
+
+- The code is GPU-ready.
+- It reads geometry and flow fields from existing continuum solvers.
+- It can be extended to more species, different wall models, or new boundary conditions.
+
+In short, this repository is a step toward **self-consistent, particle-based
+electrokinetic modeling** on top of a well-tested RWPT backbone.
