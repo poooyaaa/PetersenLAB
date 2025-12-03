@@ -267,7 +267,7 @@ This preserves the spatial structure of the simulated ion clouds while ensuring 
 ## Results
 
 <p align="center">
-  <img src="assets/initial_state_.png" alt="Particles initialization state" width="70%">
+  <img src="assets/initial_state.png" alt="Particles initialization state" width="70%">
 </p>
 
 
