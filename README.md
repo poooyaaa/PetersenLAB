@@ -167,11 +167,6 @@ The code supports two E-field modes:
   - The electric field is recomputed from particle charge density + wall charge
     by solving Poisson’s equation.
 
-This switch is controlled by a simple flag:
-
-```python
-par2.rwpt["use_continuum_E"] = use_continuum_E```
-
 This makes it possible to:
 
 - compare particle-based and continuum models on the same geometry,  
