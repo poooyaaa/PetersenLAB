@@ -270,8 +270,14 @@ This preserves the spatial structure of the simulated ion clouds while ensuring 
   <img src="assets/initial_state.png" alt="Particles initialization state" width="70%">
 </p>
 
+The figure above shows the initial particle configuration in the pore. The domain is a 2D nanochannel with periodicity in the streamwise direction and charged walls at the top and bottom. Particles are initialized according to user-specified species fractions and spatial distributions, and then evolved using the RWPT + electrokinetic rules described above.
+
+The animation below illustrates the evolution of the same particle ensemble in the presence of an applied electric field. Charged species experience electrophoretic drift superimposed on advection and diffusion, leading to the formation of ion plumes and reorganization of charge near the walls. This is the fully coupled electrokinetic RWPT mode, where the electric field is updated from the prescribed electric field.
 
 ![Simulation demo](assets/Charged_with_ex.gif)
+
+The final animation shows the fully self-consistent electrokinetic RWPT mode implemented in this project. Here, the electric field is no longer imposed from outside: it is recomputed from the particle-derived charge density and wall charge by solving Poisson’s equation at coupling times. As particles move, they reshape the charge density, which in turn updates the electric field, closing the feedback loop between ion transport and electrostatics.
+
 ![Simulation demo](assets/Charged_without_ex.gif)
 
 ---
