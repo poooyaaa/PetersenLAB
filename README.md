@@ -4,19 +4,12 @@
 
 
 
-<table>
-  <tr>
-    <td>
+
+<img src="assets/cover_fig.jpg" alt="Schematic of solver" align="right" width="380" />
 
 This repository extends the GPU-based Random Walk Particle Tracking (RWPT) code **PAR²** (Rizzo et al.) from *neutral tracers* to *charged ions*. It adds a **self-consistent electric field** obtained from particle charge density and wall charge via Poisson’s equation and supports both continuum-supplied and particle-computed E-fields. The implementation is GPU-ready (PyTorch + SciPy/CuPy) and is intended as a bridge between RWPT solvers and continuum electrokinetic codes.
 
-    </td>
-    <td>
-      <img src="assets/cover_fig.jpg" alt="Schematic" width="280">
-    </td>
-  </tr>
-</table>
-
+<br clear="right" />
 
 
 
