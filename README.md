@@ -18,76 +18,73 @@ This repository extends the GPU-based Random Walk Particle Tracking (RWPT) code 
 ## Table of Contents
 
 1. [Background & Motivation](#background--motivation)
-2. [Problem – why this matters, and what is missing](#problem--why-this-matters-and-what-is-missing)
-3. [What this project does – unique approach](#what-this-project-does--unique-approach)
+2. [What this project does – unique approach](#what-this-project-does--unique-approach)
    - [From neutral tracers to charged ions](#from-neutral-tracers-to-charged-ions)
    - [Self-consistent electric field via Poisson’s equation](#self-consistent-electric-field-via-poissons-equation)
    - [Continuum vs particle-based E-field modes](#continuum-vs-particle-based-e-field-modes)
    - [GPU-based particle motion with PyTorch](#gpu-based-particle-motion-with-pytorch)
-4. [Governing equations](#governing-equations)
-5. [Charge density from particle simulations](#charge-density-from-particle-simulations)
-6. [Field solution strategy](#field-solution-strategy)
-7. [Results](#results)
-8. [So what – why this is useful](#so-what--why-this-is-useful)
+3. [Governing equations](#governing-equations)
+4. [Charge density from particle simulations](#charge-density-from-particle-simulations)
+5. [Field solution strategy](#field-solution-strategy)
+6. [Results](#results)
+7. [So what – why this is useful](#so-what--why-this-is-useful)
 
 ---
 
 ## Background & Motivation
 
 Electrokinetic transport in charged nanochannels and porous media is hard to
-simulate. The system couples
+simulate. These systems feature
+
+- charged walls,  
+- overlapping electric double layers,  
+- and strong coupling between flow, diffusion, and electromigration,
+
+all happening in complex geometries. Capturing this faithfully requires
+resolving the interplay between
 
 - fluid flow,  
 - ion migration,  
 - diffusion,  
 - and electric fields  
 
-in complex geometries.
+in a way that preserves sharp concentration fronts and remains affordable in 2D/3D.
 
 Most existing tools fall into two groups:
 
-- **Eulerian continuum solvers** (Poisson–Nernst–Planck, Poisson–Boltzmann, etc.)  
-  These work on fixed grids and can suffer from numerical diffusion and high
-  cost in 2D/3D.
+- **Eulerian continuum solvers** (Poisson–Nernst–Planck, Poisson–Boltzmann, etc.).  
+  These work on fixed grids and can be expensive in complex 2D/3D domains. They also
+  tend to introduce numerical diffusion, which can smear sharp concentration fronts.
 
 - **Lagrangian RWPT solvers for neutral solutes.**  
-  These are efficient and easy to parallelize, but usually do **not** include
-  electrostatics or multi-species charged ions.
+  These are efficient, easy to parallelize (especially on GPUs), and handle
+  hydrodynamic dispersion rigorously. However, they usually **do not** include
+  electrostatics or multi-species charged ions and therefore ignore ion–field
+  feedback altogether.
 
 The **PAR²** code by Rizzo et al. is a GPU-accelerated RWPT implementation for
 conservative tracers in porous media. PAR² tracks neutral particles in a given
-velocity field and models hydrodynamic dispersion in a rigorous way.
-
-However, in many electrokinetic problems, **feedback between ions and the
-electric field is essential**:
+velocity field and models hydrodynamic dispersion in a rigorous way. But in many
+electrokinetic problems, **feedback between ions and the electric field is
+essential**:
 
 - Ion distributions modify the electric field.  
 - The electric field, in turn, modifies ion motion.  
-- A neutral RWPT model cannot capture this loop.
 
-This project bridges this gap by coupling a particle-based RWPT solver with
-continuum electrostatics through Poisson’s equation.
-
----
-
-## Problem – why this matters, and what is missing
-
-Electrokinetic transport in charged nanochannels and porous media involves:
-
-- charged walls,  
-- overlapping electric double layers,  
-- strong coupling between flow, diffusion, and electromigration.
-
-Classical continuum approaches can be expensive and may smear sharp concentration
-fronts due to numerical diffusion. Pure RWPT approaches ignore electrostatic
-interactions altogether.
+A neutral RWPT model cannot capture this loop, and classical continuum models
+are often too diffusive and too expensive.
 
 What is missing is a **GPU-ready, particle-based electrokinetic solver** that:
 
 - tracks individual ions as particles,  
 - computes a **self-consistent** electric field from their charge distribution
-  and wall charge,  
+  and wall charge via Poisson’s equation,  
 - and can still interface cleanly with existing continuum solvers.
+
+This project aims to bridge that gap by coupling a particle-based RWPT solver
+with continuum electrostatics to build a self-consistent, GPU-accelerated
+electrokinetic transport framework.
+
 
 ---
 
