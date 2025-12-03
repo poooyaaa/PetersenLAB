@@ -191,3 +191,39 @@ Utilities are provided to:
 - restart a simulation from the last snapshot,
 - plot “unfolded” particle positions in a periodic channel,
 - separate species and visualize them with different colors.
+
+---
+## Governing equations
+
+The electrostatic potential $\Phi(\mathbf{x})$ is governed by **Poisson’s equation**:
+
+$$
+-\varepsilon \nabla^2 \Phi(\mathbf{x}) = \rho_c(\mathbf{x}),
+$$
+
+where
+
+- $\varepsilon$ is the permittivity of the medium,
+- $\Phi(\mathbf{x})$ is the electrostatic potential,
+- $\rho_c(\mathbf{x})$ is the volumetric charge density.
+
+Equivalently, the electric field is
+
+$$
+\mathbf{E}(\mathbf{x}) = -\nabla \Phi(\mathbf{x}), \qquad
+\nabla \cdot \mathbf{E}(\mathbf{x}) = \rho_c(\mathbf{x}).
+$$
+
+To compute $\rho_c(\mathbf{x})$, we consider the local density of cations and anions in each voxel of the simulation domain. The volumetric charge density is
+
+$$
+\rho_c(\mathbf{x}) = e_0 \bigl(c^+(\mathbf{x}) - c^-(\mathbf{x})\bigr),
+$$
+
+where
+
+- $e_0$ is the elementary charge,
+- $c^+(\mathbf{x})$ is the cation concentration,
+- $c^-(\mathbf{x})$ is the anion concentration.
+
+---
