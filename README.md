@@ -170,7 +170,7 @@ The code supports two E-field modes:
 This switch is controlled by a simple flag:
 
 ```python
-par2.rwpt["use_continuum_E"] = use_continuum_E
+par2.rwpt["use_continuum_E"] = use_continuum_E```
 
 This makes it possible to:
 
