@@ -173,4 +173,21 @@ This makes it possible to:
 - start from a continuum field and later include feedback from particles,  
 - test how different surface-charge patterns affect ion transport.
 
-That’s it — those three bullets plus the “This makes it possible to:” line.
+### (d) GPU-based particle motion with PyTorch
+
+The RWPT part is implemented in **PyTorch**.
+
+All particle positions and velocities are stored as tensors on the chosen device:
+
+- CUDA GPU (if available),
+- Apple MPS,
+- or CPU as fallback.
+
+The code can track up to $10^5$–$10^6$ particles over millions of time steps.  
+Snapshots of the particle states are stored to disk as NumPy arrays.
+
+Utilities are provided to:
+
+- restart a simulation from the last snapshot,
+- plot “unfolded” particle positions in a periodic channel,
+- separate species and visualize them with different colors.
