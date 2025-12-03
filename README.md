@@ -1,113 +1,154 @@
-# PetersenLAB
+# Particle-based Electrokinetic RWPT (pyPAR² extension)
 
-# Coupling Particle Simulations with Continuum Electrostatics
-**Computing Electric Fields from Particle-Derived Charge Densities**  
-*Author: Pouya Golchin*
+**Computing electric fields from particle-derived charge densities**
 
-> This project couples GPU-accelerated Brownian particle simulations with continuum electrostatics. The central idea is to compute the columetric charge density directly from particle positions, then solve Poisson's equation to obtain the electric potential and field. This enables (i) validation against continuum electrokinetic models and (ii) quantification of electric-double-layer screening at charged walls.
+This repository extends a GPU-based Random Walk Particle Tracking (RWPT) code (PAR² by Rizzo et al.) from **neutral tracers to charged ions**.  
+It also adds a **self-consistent electric field** computed from particle charge density and wall charge, and provides a bridge to continuum electrokinetic solvers.
 
 ---
 
 ## Table of Contents
-- [Background](#background)
-- [Governing Equations](#governing-equations)
-- [Charge Density from Particle Simulations](#charge-density-from-particle-simulations)
-- [Field Solution Strategy](#field-solution-strategy)
-- [RWPT–Continuum Coupling: Visualization](#rwptcontinuum-coupling-visualization)
-- [Future Test Case: Salt-Asymmetric Channel with Sinusoidal Wall Charge](#future-test-case-salt-asymmetric-channel-with-sinusoidal-wall-charge)
+
+1. [Background & Motivation](#background--motivation)  
+2. [Problem – why this matters, and what is missing](#problem--why-this-matters-and-what-is-missing)  
+3. [What this project does – unique approach](#what-this-project-does--unique-approach)  
+   - [From neutral tracers to charged ions](#a-from-neutral-tracers-to-charged-ions)  
+   - [Self-consistent electric field via Poisson’s equation](#b-self-consistent-electric-field-via-poissons-equation)  
+   - [Continuum vs particle-based E-field modes](#c-continuum-vs-particle-based-e-field-modes)  
+   - [GPU-based particle motion with PyTorch](#d-gpu-based-particle-motion-with-pytorch)  
+4. [Governing equations](#governing-equations)  
+5. [Charge density from particle simulations](#charge-density-from-particle-simulations)  
+6. [Field solution strategy](#field-solution-strategy)  
+7. [RWPT–continuum coupling: visualization](#rwptcontinuum-coupling-visualization)  
+8. [So what – why this is useful](#so-what--why-this-is-useful)
 
 ---
 
-## Background
-This study bridges continuum electrochemical equations with particle-based simulations in nanoscale pores. Instead of always prescribing the electric field from a continuum solver, we periodically **measure** the charge density \( \rho_c(\mathbf{x}) \) from particle positions and solve the field self-consistently. This provides a complementary view on screening and equilibrium structure and leverages GPU parallelism to generate many realizations of ion positions.
+## Background & Motivation
+
+Electrokinetic transport in charged nanochannels and porous media is hard to simulate.  
+The system couples:
+
+- fluid flow,
+- ion migration,
+- diffusion,
+- and electric fields
+
+in complex geometries.
+
+Most existing tools fall into two groups:
+
+- **Eulerian continuum solvers** (Poisson–Nernst–Planck, Poisson–Boltzmann, etc.)  
+  These work on fixed grids and can suffer from numerical diffusion and high cost in 2D/3D.
+
+- **Lagrangian RWPT solvers for neutral solutes**.  
+  These are efficient and easy to parallelize, but usually do **not** include electrostatics or multi-species charged ions.
+
+The PAR² code by Rizzo et al. is a GPU-accelerated RWPT implementation for conservative tracers in porous media. PAR² tracks neutral particles in a given velocity field and models hydrodynamic dispersion in a rigorous way.
+
+However, in many electrokinetic problems, **feedback between ions and the electric field is essential**:
+
+- Ion distributions modify the electric field.  
+- The electric field, in turn, modifies ion motion.  
+- A neutral RWPT model cannot capture this loop.
+
+This project bridges this gap by coupling a particle-based RWPT solver with continuum electrostatics through Poisson’s equation.
 
 ---
 
-## Governing Equations
-The electrostatic potential $\Phi(x)$ is governed by Poisson’s equation:
+## Problem – why this matters, and what is missing
 
-$$
--\varepsilon \nabla^2 \Phi(x) = \rho_c(x)
-$$
+Electrokinetic transport in charged nanochannels and porous media involves:
 
-where $\varepsilon$ is the permittivity of the medium, $\Phi(\mathbf{x})$ is electrostatic potential, and $\rho_c$ is the volumetric charge density distribution.
+- charged walls,
+- overlapping electric double layers,
+- strong coupling between flow, diffusion, and electromigration.
 
-Equivalently, the electric field is 
+Classical continuum approaches can be expensive and may smear sharp concentration fronts due to numerical diffusion. Pure RWPT approaches ignore electrostatic interactions altogether.
 
-$$
-\mathbf{E}(x) = -\nabla \Phi(x), \qquad \nabla \cdot \mathbf{E}(x) = \rho_c(x).
-$$
+What is missing is a **GPU-ready, particle-based electrokinetic solver** that:
 
-To compute $\rho_c(\mathbf{x})$, we consider the local density of cations and anions in each voxel of the simulation domain. The volumetric charge density is:
-
-
-$$
-\rho_c(x) = e_0 \big(c_{+}(x) - c_{-}(x)\big),
-$$
-
-where $e_0$ is the elementary charge, $c_{+}$ is the cation concentration, and $c_{-}$ is the anion concentration.
+- tracks individual ions as particles,
+- computes a **self-consistent** electric field from their charge distribution and wall charge,
+- and can still interface cleanly with existing continuum solvers.
 
 ---
 
-## Charge Density from Particle Simulations
-Discretize the domain into voxels $\mathcal{V}_j$ with volume $\Delta V$. From instantaneous particle positions,
-form voxel counts $N^{+}_j$ and $N^{-}_j$. The corresponding number concentrations are:
+## What this project does – unique approach
 
-$$
-c_{+}(x_j) \approx \frac{N^{+}_j}{\Delta V}, \qquad
-c_{-}(x_j) \approx \frac{N^{-}_j}{\Delta V}.
-$$
+This repository takes the PAR² RWPT idea and extends it in three main directions:
 
-Substituting the voxel-based expression for ion concentrations into volumetric charge density relation gives a piecewise-constant estimator for $\rho_c$.
+1. From neutral tracers to **charged ion species**.  
+2. A **self-consistent** electric field computed by solving Poisson’s equation.  
+3. A flexible coupling between **continuum** and **particle-based** E-field descriptions, with GPU-accelerated RWPT implemented in PyTorch.
 
-**Statistical rescaling.** If the real system contains $N_{\mathrm{real}}$ ions but we simulate $N_{\mathrm{sim}}\gg N_{\mathrm{real}}$ independent Brownian trajectories, then
+### (a) From neutral tracers to charged ions
 
-$$
-\rho_c^{\mathrm{real}}(x) = \frac{N_{\mathrm{real}}}{N_{\mathrm{sim}}}\,\rho_c^{\mathrm{sim}}(x).
-$$
+Particles are no longer just passive solute markers.  
+Each particle belongs to a **species** (cation, anion, neutral). Each species has:
 
-This approach preserves the spatial structure of the simulated ions while ensuring consistency with the physical number density.
+- an integer charge number \(z_m\),
+- a diffusion coefficient \(D_m\),
+- an electrophoretic mobility  
+  \[
+  \mu_e = \frac{D_m z_m q_e}{k_B T}.
+  \]
 
----
+The code initializes a mixture of species with user-defined fractions.  
+The RWPT update then includes both:
 
-## Field Solution Strategy
-At selected coupling times $t_k$:
-
-1. **Aggregate positions:** collect particle coordinates $\{x_i(t_k)\}$.
-2. **Form $\rho_c(x)$:** bin particles to voxels.
-3. **Solve Poisson:** compute $\Phi$ and $\mathbf{E}=-\nabla\Phi$; store $(\Phi,\mathbf{E})$.
-4. **Update field:** inject the new field into the particle simulator.
-5. **Advance particles:** integrate the next block of Brownian steps with electrostatic forces.
-
-Coupling does not occur every micro-step; choose a stride $n_{\mathrm{BD}}\in \mathbb{N}$ (particles advance $n_{\mathrm{BD}}$ steps between field updates).
+- **advection** by the fluid velocity,  
+- **drift** in the electric field due to electrophoresis.
 
 ---
 
-## RWPT–Continuum Coupling: Visualization
+### (b) Self-consistent electric field via Poisson’s equation
 
+The code can compute the electric field **self-consistently** from particle charges and wall charge.
 
-![Simulation demo](assets/animation.gif)
+At selected time steps, it:
 
-This visualization shows the **Random Walk Particle Tracking (RWPT)** simulation of charged ions in a nanoscale channel. The upper panels display the normalized ion concentration profiles of anions (orange) and cations (purple) across the channel, while the lower panels show the corresponding particle positions at different times.
+1. Deposits particle charges on a structured grid to build a volumetric charge density \(\rho_c(x,y)\).  
+2. Adds a **surface charge** on the top and bottom walls, using a flexible profile:
+   - uniform charge,
+   - sinusoidal charge,
+   - absolute sinusoidal charge.
+3. Solves a **Poisson problem**
+   \[
+     -\epsilon \nabla^2 \phi = \rho_c
+   \]
+   with:
+   - periodic boundary conditions in \(x\),
+   - Neumann boundary conditions at the walls based on the given surface charge.
+4. Computes the electric field as
+   \[
+     \mathbf{E} = -\nabla \phi
+   \]
+   on the same structured grid used for RWPT.
 
-Initially, particles are uniformly distributed within one pore, with roughly $10^5$ trajectories initialized randomly across the domain. To drive the system, we impose the electrostatic potential and velocity fields obtained from a **continuum electrokinetic solver**. These fields act as external forces on the ions, steering their motion over time.
+The Poisson solver uses high-order compact finite-difference schemes.  
+The global system is assembled as a sparse matrix and solved either:
 
-As the simulation progresses, the cations and anions redistribute and self-organize into regions consistent with the applied electric field. The ions accumulate preferentially in zones where the field aligns with their charge polarity, while being excluded from unfavorable regions. This dynamic adjustment demonstrates how microscopic particle transport reflects the macroscopic electrostatic structure.
+- on the **CPU** with SciPy sparse linear algebra, or  
+- on the **GPU** with CuPy-based iterative solvers (when available).
 
-The results highlight a key insight: instead of always prescribing fields from continuum mechanics into particle simulations, we can **invert the workflow**. By measuring particle positions, constructing the charge density, and solving Poisson’s equation, we can directly obtain the electric field from RWPT simulations. This reverse coupling provides a pathway to validate continuum models and to quantify screening effects from the particle perspective.
+The updated field \(\mathbf{E}(x,y)\) is then interpolated back to particle positions and used in the next RWPT update.
 
 ---
 
-## Future Test Case: Salt-Asymmetric Channel with Sinusoidal Wall Charge
+### (c) Continuum vs particle-based E-field modes
 
-Later, this method will be tested on a more challenging configuration: a channel with **two different bulk salt concentrations** (left vs. right) and **sinusoidally varying surface charges** along the walls.
+The code supports two E-field modes:
 
-- **Setup:** The left reservoir contains a high salt concentration, while the right reservoir has a low salt concentration. This concentration gradient naturally drives ions across the interface.  
-- **Boundary forcing:** The top and bottom walls are decorated with sinusoidal charge patterns, alternating between cation-attracting and anion-attracting regions.  
-- **Expected outcome:** The combined action of the salt gradient and the oscillatory wall charges should produce a spatially modulated ion distribution, with electric fields that cannot be captured by simple uniform-wall models.
+- **Continuum mode** (`use_continuum_E = True`):  
+  - The electric field comes from an external continuum solver (e.g. Stokes / electrokinetic code).  
+  - The field is loaded from file and interpolated onto the RWPT grid.  
+  - No Poisson solve from particles is performed.
 
-This example serves as a validation benchmark: if the RWPT-derived charge density $\\rho_c(\\mathbf{x})$ correctly reproduces the field structure predicted by continuum electrostatics, it demonstrates the robustness of the **particle-to-field coupling** framework.
+- **Self-consistent mode** (`use_continuum_E = False`):  
+  - The electric field is recomputed from particle charge density + wall charge by solving Poisson’s equation.
 
-<p align="center">
-  <img src="assets/fig_example.png" alt="Salt-asymmetric channel with sinusoidal wall charges" width="70%">
-</p>
+This switch is controlled by a simple flag:
+
+```python
+par2.rwpt["use_continuum_E"] = use_continuum_E
