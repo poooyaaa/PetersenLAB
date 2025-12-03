@@ -25,3 +25,41 @@ solvers.
 6. [Field solution strategy](#field-solution-strategy)
 7. [RWPT–continuum coupling: visualization](#rwptcontinuum-coupling-visualization)
 8. [So what – why this is useful](#so-what--why-this-is-useful)
+
+---
+
+## Background & Motivation
+
+Electrokinetic transport in charged nanochannels and porous media is hard to
+simulate. The system couples
+
+- fluid flow,  
+- ion migration,  
+- diffusion,  
+- and electric fields  
+
+in complex geometries.
+
+Most existing tools fall into two groups:
+
+- **Eulerian continuum solvers** (Poisson–Nernst–Planck, Poisson–Boltzmann, etc.)  
+  These work on fixed grids and can suffer from numerical diffusion and high
+  cost in 2D/3D.
+
+- **Lagrangian RWPT solvers for neutral solutes.**  
+  These are efficient and easy to parallelize, but usually do **not** include
+  electrostatics or multi-species charged ions.
+
+The **PAR²** code by Rizzo et al. is a GPU-accelerated RWPT implementation for
+conservative tracers in porous media. PAR² tracks neutral particles in a given
+velocity field and models hydrodynamic dispersion in a rigorous way.
+
+However, in many electrokinetic problems, **feedback between ions and the
+electric field is essential**:
+
+- Ion distributions modify the electric field.  
+- The electric field, in turn, modifies ion motion.  
+- A neutral RWPT model cannot capture this loop.
+
+This project bridges this gap by coupling a particle-based RWPT solver with
+continuum electrostatics through Poisson’s equation.
