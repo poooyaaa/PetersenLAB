@@ -132,7 +132,7 @@ At selected time steps, it:
 3. Solves a Poisson problem
 
 $$
--\varepsilon \nabla^2 \phi = \rho_c
+-\varepsilon \nabla^2 \Phi = \rho_c
 $$
 
    with:
