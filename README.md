@@ -23,11 +23,10 @@ This repository extends the GPU-based Random Walk Particle Tracking (RWPT) code 
    - [Self-consistent electric field via Poisson’s equation](#self-consistent-electric-field-via-poissons-equation)
    - [Continuum vs particle-based E-field modes](#continuum-vs-particle-based-e-field-modes)
    - [GPU-based particle motion with PyTorch](#gpu-based-particle-motion-with-pytorch)
+   - [Field–particle coupling strategy](#field-particle-coupling-strategy)
 3. [Governing equations](#governing-equations)
-4. [Charge density from particle simulations](#charge-density-from-particle-simulations)
-5. [Field solution strategy](#field-solution-strategy)
-6. [Results](#results)
-7. [Applications and impact](#applications-and-impact)
+4. [Results](#results)
+5. [Applications and impact](#applications-and-impact)
 
 ---
 
@@ -193,6 +192,21 @@ Utilities are provided to:
 - plot “unfolded” particle positions in a periodic channel,
 - separate species and visualize them with different colors.
 
+
+### (e) Field–particle coupling strategy
+
+Putting the pieces together, the code performs a coupled field–particle update at selected times $t_k$:
+
+1. **Aggregate positions**: collect particle coordinates $\mathbf{x}_i(t_k)$.
+2. **Form $\rho_c(\mathbf{x})$**: bin particles into voxels and construct the charge density.
+3. **Solve Poisson**: compute $\Phi$ and $\mathbf{E} = -\nabla \Phi$; store $(\Phi, \mathbf{E})$.
+4. **Update field**: inject the new field into the particle simulator.
+5. **Advance particles**: integrate the next block of Brownian steps with electrostatic forces.
+
+Coupling does not occur at every micro-step; instead we choose a stride $n_{\mathrm{BD}} \in \mathbb{N}$.  
+Particles advance $n_{\mathrm{BD}}$ RWPT steps between field updates.
+
+
 ---
 ## Governing equations
 
@@ -241,27 +255,12 @@ charge-density relation gives a **piecewise-constant estimator** for $\rho_c$ on
 
 $$
 \rho_c^{\text{real}}(\mathbf{x}) =
-\frac{N_{\text{real}}}{N_{\text{sim}}}\,
+\frac{N_{\text{real}}}{N_{\text{sim}}}\.
 \rho_c^{\text{sim}}(\mathbf{x}).
 $$
 
 This preserves the spatial structure of the simulated ion clouds while ensuring consistency with the physical number density used in the Poisson solve.
 
-
----
-
-## Field solution strategy
-
-At selected coupling times $t_k$, the code performs a field update:
-
-1. **Aggregate positions**: collect particle coordinates $\mathbf{x}_i(t_k)$.
-2. **Form $\rho_c(\mathbf{x})$**: bin particles into voxels and construct the charge density.
-3. **Solve Poisson**: compute $\Phi$ and $\mathbf{E} = -\nabla \Phi$; store $(\Phi, \mathbf{E})$.
-4. **Update field**: inject the new field into the particle simulator.
-5. **Advance particles**: integrate the next block of Brownian steps with electrostatic forces.
-
-Coupling does not occur at every micro-step; instead we choose a stride $n_{\mathrm{BD}} \in \mathbb{N}$.  
-Particles advance $n_{\mathrm{BD}}$ RWPT steps between field updates.
 
 ---
 
