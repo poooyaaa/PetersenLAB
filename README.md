@@ -153,3 +153,19 @@ system is assembled as a sparse matrix and solved either:
 
 The updated field $\mathbf{E}(x, y)$ is then interpolated back to particle
 positions and used in the next RWPT update.
+
+### (c) Continuum vs particle-based E-field modes
+
+The code supports two E-field modes:
+
+- **Continuum mode** (`use_continuum_E = True`):
+  - The electric field comes from an external continuum solver (e.g. Stokes / electrokinetic code).
+  - The field is loaded from file and interpolated onto the RWPT grid.
+  - No Poisson solve from particles is performed.
+- **Self-consistent mode** (`use_continuum_E = False`):
+  - The electric field is recomputed from particle charge density + wall charge by solving Poisson’s equation.
+
+This switch is controlled by a simple flag:
+
+```python
+par2.rwpt["use_continuum_E"] = use_continuum_E
