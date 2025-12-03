@@ -1,6 +1,6 @@
-# Particle-based Electrokinetic RWPT (pyPAR² extension)
+# A GPU-accelerated particle-based solver for charged ions in nanochannels 
 
-**Computing electric fields from particle-derived charge densities**
+**pyPAR² extension**
 
 
 
