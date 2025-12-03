@@ -244,7 +244,8 @@ charge-density relation gives a **piecewise-constant estimator** for $\rho_c$.
 
 **Statistical rescaling.** If the real system contains $N_{\text{real}}$ ions,
 but we simulate $N_{\text{sim}} \gg N_{\text{real}}$ independent Brownian
-trajectories, then
+trajectories. This approach preserves the spatial structure of the simulated ion clouds while
+ensuring consistency with the physical number density.
 
 $$
 \rho_c^{\text{real}}(\mathbf{x}) =
@@ -252,8 +253,6 @@ $$
 \rho_c^{\text{sim}}(\mathbf{x}).
 $$
 
-This approach preserves the spatial structure of the simulated ion clouds while
-ensuring consistency with the physical number density.
 ---
 
 ## Field solution strategy
