@@ -2,12 +2,16 @@
 
 **Computing electric fields from particle-derived charge densities**
 
-This repository extends a GPU-based Random Walk Particle Tracking (RWPT) code  
-(**PAR²** by Rizzo et al.) from *neutral tracers* to *charged ions*.  
 
-It also adds a **self-consistent electric field** computed from particle charge
-density and wall charge, and provides a bridge to continuum electrokinetic
-solvers.
+
+
+
+
+
+
+
+This repository extends the GPU-based Random Walk Particle Tracking (RWPT) code **PAR²** (Rizzo et al.) from *neutral tracers* to *charged ions*. It adds a **self-consistent electric field** obtained from particle charge density and wall charge via Poisson’s equation and supports both continuum-supplied and particle-computed E-fields. The implementation is GPU-ready (PyTorch + SciPy/CuPy) and is intended as a bridge between RWPT solvers and continuum electrokinetic codes.
+
 
 ---
 
@@ -23,7 +27,7 @@ solvers.
 4. [Governing equations](#governing-equations)
 5. [Charge density from particle simulations](#charge-density-from-particle-simulations)
 6. [Field solution strategy](#field-solution-strategy)
-7. [RWPT–continuum coupling: visualization](#rwptcontinuum-coupling-visualization)
+7. [Results](#results)
 8. [So what – why this is useful](#so-what--why-this-is-useful)
 
 ---
