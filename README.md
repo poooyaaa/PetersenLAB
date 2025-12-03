@@ -159,13 +159,23 @@ positions and used in the next RWPT update.
 The code supports two E-field modes:
 
 - **Continuum mode** (`use_continuum_E = True`):
-  - The electric field comes from an external continuum solver (e.g. Stokes / electrokinetic code).
+  - The electric field comes from an external continuum solver (e.g. Stokes /
+    electrokinetic code).
   - The field is loaded from file and interpolated onto the RWPT grid.
   - No Poisson solve from particles is performed.
 - **Self-consistent mode** (`use_continuum_E = False`):
-  - The electric field is recomputed from particle charge density + wall charge by solving Poisson’s equation.
+  - The electric field is recomputed from particle charge density + wall charge
+    by solving Poisson’s equation.
 
 This switch is controlled by a simple flag:
 
 ```python
 par2.rwpt["use_continuum_E"] = use_continuum_E
+
+This makes it possible to:
+
+- compare particle-based and continuum models on the same geometry,  
+- start from a continuum field and later include feedback from particles,  
+- test how different surface-charge patterns affect ion transport.
+
+That’s it — those three bullets plus the “This makes it possible to:” line.
