@@ -101,12 +101,13 @@ This repository takes the PAR² RWPT idea and extends it in three main direction
 Particles are no longer just passive solute markers.  
 Each particle belongs to a **species** (cation, anion, neutral). Each species has:
 
-- an integer charge number \( z_m \),  
-- a diffusion coefficient \( D_m \),  
+- an integer charge number $z_m$,  
+- a diffusion coefficient $D_m$,  
 - an electrophoretic mobility
-  \[
-  \mu_e = \frac{D_m z_m q_e}{k_B T}.
-  \]
+
+$$
+\mu_e = \frac{D_m z_m q_e}{k_B T}.
+$$
 
 The code initializes a mixture of species with user-defined fractions.  
 The RWPT update then includes both:
@@ -119,26 +120,29 @@ The RWPT update then includes both:
 The code can compute the electric field **self-consistently** from particle charges and
 wall charge.
 
-
 At selected time steps, it:
 
 1. Deposits particle charges on a structured grid to build a volumetric charge
-   density \( \rho_c(x, y) \).
+   density $\rho_c(x, y)$.
 2. Adds a surface charge on the top and bottom walls, using a flexible profile:
    - uniform charge,
    - sinusoidal charge,
    - absolute sinusoidal charge.
 3. Solves a Poisson problem
-   $$
-   -\varepsilon \nabla^2 \phi = \rho_c
-   $$
+
+$$
+-\varepsilon \nabla^2 \phi = \rho_c
+$$
+
    with:
-   - periodic boundary conditions in \( x \),
+   - periodic boundary conditions in $x$,
    - Neumann boundary conditions at the walls based on the given surface charge.
 4. Computes the electric field as
-   $$
-   \mathbf{E} = -\nabla \phi
-   $$
+
+$$
+\mathbf{E} = -\nabla \phi
+$$
+
    on the same structured grid used for RWPT.
 
 The Poisson solver uses high-order compact finite-difference schemes. The global
@@ -147,5 +151,5 @@ system is assembled as a sparse matrix and solved either:
 - on the CPU with SciPy sparse linear algebra, or  
 - on the GPU with CuPy-based iterative solvers (when available).
 
-The updated field \( \mathbf{E}(x, y) \) is then interpolated back to particle
+The updated field $\mathbf{E}(x, y)$ is then interpolated back to particle
 positions and used in the next RWPT update.
