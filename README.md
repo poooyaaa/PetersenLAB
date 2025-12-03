@@ -63,3 +63,26 @@ electric field is essential**:
 
 This project bridges this gap by coupling a particle-based RWPT solver with
 continuum electrostatics through Poisson’s equation.
+
+---
+
+## Problem – why this matters, and what is missing
+
+Electrokinetic transport in charged nanochannels and porous media involves:
+
+- charged walls,  
+- overlapping electric double layers,  
+- strong coupling between flow, diffusion, and electromigration.
+
+Classical continuum approaches can be expensive and may smear sharp concentration
+fronts due to numerical diffusion. Pure RWPT approaches ignore electrostatic
+interactions altogether.
+
+What is missing is a **GPU-ready, particle-based electrokinetic solver** that:
+
+- tracks individual ions as particles,  
+- computes a **self-consistent** electric field from their charge distribution
+  and wall charge,  
+- and can still interface cleanly with existing continuum solvers.
+
+---
