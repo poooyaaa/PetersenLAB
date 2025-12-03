@@ -18,7 +18,7 @@ This repository extends the GPU-based Random Walk Particle Tracking (RWPT) code 
 ## Table of Contents
 
 1. [Background & Motivation](#background--motivation)
-2. [What this project does – unique approach](#what-this-project-does--unique-approach)
+2. [Core ideas and implementation](#core-ideas-and-implementation)
    - [From neutral tracers to charged ions](#from-neutral-tracers-to-charged-ions)
    - [Self-consistent electric field via Poisson’s equation](#self-consistent-electric-field-via-poissons-equation)
    - [Continuum vs particle-based E-field modes](#continuum-vs-particle-based-e-field-modes)
@@ -27,7 +27,7 @@ This repository extends the GPU-based Random Walk Particle Tracking (RWPT) code 
 4. [Charge density from particle simulations](#charge-density-from-particle-simulations)
 5. [Field solution strategy](#field-solution-strategy)
 6. [Results](#results)
-7. [So what – why this is useful](#so-what--why-this-is-useful)
+7. [Applications and impact](#applications-and-impact)
 
 ---
 
@@ -88,7 +88,7 @@ electrokinetic transport framework.
 
 ---
 
-## What this project does – unique approach
+## Core ideas and implementation
 
 This repository takes the PAR² RWPT idea and extends it in three main directions:
 
@@ -276,7 +276,7 @@ Particles advance $n_{\mathrm{BD}}$ RWPT steps between field updates.
 
 ---
 
-## So what – why this is useful
+## Applications and impact
 
 This project turns a neutral RWPT code into a **particle-based electrokinetic
 simulator**.
